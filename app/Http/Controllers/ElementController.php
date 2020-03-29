@@ -4,28 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Element;
 use App\Http\Responses;
+use App\Http\Controllers\ElementResponseMap;
+use App\Http\Controllers\ElementTagResponseMap;
 use Illuminate\Http\Request;
+
 
 class ElementController extends Controller
 {
-	
-	private function getAttributes(Element $element) {
-		return ["title" => $element->title, "description" => $element->description];
-	}
-	
-	private function map(Element $element) {
-		return Responses::item($element->id, "elements", $this->getAttributes($element));
-	}
-	
-	private function mapWithTags(Element $element) {
-		return Responses::itemWithRelations($element->id, "elements", $this->getAttributes($element), "tags", $element->tags()->get());
+	public function mapWithTags(Element $element) {
+		//ElementTagResponseMap::map
+		return Responses::itemWithRelations(
+			$element->id, 
+			"elements", 
+			ElementResponseMap::getAttributes($element), 
+			"tags", 
+			$element->tags()->get(), 
+			function ($tag){ 
+				return ElementTagResponseMap::map($tag);
+			}
+		);
 	}
 	
     public function index()
     {
 		$arr = array();
 		foreach (Element::all() as $elem) {
-			array_push($arr, $this->map($elem));
+			array_push($arr, ElementResponseMap::map($elem));
 		}
         //return Element::all();
 		return Responses::list($arr);
@@ -33,7 +37,7 @@ class ElementController extends Controller
  
     public function show(Element $element)
     {
-		return response()->json($this->map($element), 200);
+		return response()->json(ElementResponseMap::map($element), 200);
     }
 
     public function showWithTags(Element $element)
@@ -44,13 +48,13 @@ class ElementController extends Controller
     public function store(Request $request)
     {
         $element = Element::create($request->all());
-        return response()->json($this->map($element), 201);
+        return response()->json(ElementResponseMap::map($element), 201);
     }
 
     public function update(Request $request, Element $element)
     {
         $element->update($request->all());
-        return response()->json($this->map($element), 200);
+        return response()->json(ElementResponseMap::map($element), 200);
     }
 
     public function delete(Element $element)

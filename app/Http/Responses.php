@@ -18,13 +18,16 @@ class Responses
 		return ["id" => $id, "type" => $type, "attributes" => $attributes];
 	}
 
-	public static function itemWithRelations($id, $type, $attributes, $relType, $relationData)
+	public static function itemWithRelations($id, $type, $attributes, $relType, $relationData, $mapFoo)
 	{
 		$relData = array();
+		$includes = array();
 		foreach ($relationData as $item) {
 			array_push($relData, ["id" => $item->id, "type" => $relType]);
+			array_push($includes, $mapFoo($item));
 		}
-		return array_merge(Responses::item($id, $type, $attributes), ["relationships" => [$relType => ["data" => $relData] ], "includes" => $relationData]);
+		
+		return array_merge(Responses::item($id, $type, $attributes), ["relationships" => [$relType => ["data" => $relData] ], "includes" => $includes]);
 	}
 
 }
