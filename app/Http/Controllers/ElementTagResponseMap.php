@@ -7,7 +7,7 @@ use App\Http\Responses;
 
 class ElementTagResponseMap {
 	public static function getAttributes(ElementTag $elementTag) {
-		return ["title" => $elementTag->title, "created_at" => $elementTag->created_at, "updated_at" => $elementTag->updated_at];
+		return ["title" => $elementTag->title, "created-at" => $elementTag->created_at->toAtomString(), "updated-at" => $elementTag->updated_at->toAtomString()];
 	}
 	
 	public static function map(ElementTag $elementTag) {
