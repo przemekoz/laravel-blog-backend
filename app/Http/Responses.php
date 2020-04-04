@@ -4,14 +4,23 @@ namespace App\Http;
 
 class Responses
 {
-    protected $fillable = ['title'];
 
-    public static function list($data)
+    public static function list($result, $mapFoo)
     {
-        return ["data" => $data, "meta" => ["acme" => "acme"]];
+		//print_r($result);
+		$data = array();
+		foreach ($result->items() as $item) {
+			array_push($data, $mapFoo($item));
+		}
+		$meta = [
+			'total' => $result->total(), 
+			'currentPage' => $result->currentPage(), 
+			'lastPage' => $result->lastPage(), 
+			'size' => $result->perPage()
+		];
+		return ['data' => $data, 'meta' => $meta];
+		
     }
-	
-	
 	
 	public static function item($id, $type, $attributes)
 	{
@@ -28,6 +37,13 @@ class Responses
 		}
 		
 		return array_merge(Responses::item($id, $type, $attributes), ["relationships" => [$relType => ["data" => $relData] ], "includes" => $includes]);
+	}
+	
+	public static function getPaging($page)
+	{
+		$size = isset($page['size']) ? $page['size'] : 10;
+		$page = isset($page['number']) ? $page['number'] : 0;	
+		return ['page'=>$page, 'size'=>$size];
 	}
 
 }

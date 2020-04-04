@@ -25,14 +25,14 @@ class ElementController extends Controller
 		);
 	}
 	
-    public function index()
+    public function index(Request $request)
     {
-		$arr = array();
-		foreach (Element::all() as $elem) {
-			array_push($arr, ElementResponseMap::map($elem));
-		}
+		$paging = Responses::getPaging($request->has('page') ? $request->input('page') : []);
+		
+		//public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null);		
+        $result = Element::paginate($paging['size'], ['*'], 'page', $paging['page']);
         //return Element::all();
-		return Responses::list($arr);
+		return Responses::list($result, function($elem){ return ElementResponseMap::map($elem); });
     }
  
     public function show(Element $element)
