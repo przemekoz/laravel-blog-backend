@@ -5,9 +5,8 @@ namespace App\Http;
 class Responses
 {
 
-    public static function list($result, $mapFoo)
+    public static function list($result, $sortMode, $mapFoo)
     {
-		//print_r($result);
 		$data = array();
 		foreach ($result->items() as $item) {
 			array_push($data, $mapFoo($item));
@@ -16,8 +15,10 @@ class Responses
 			'total' => $result->total(), 
 			'currentPage' => $result->currentPage(), 
 			'lastPage' => $result->lastPage(), 
-			'size' => $result->perPage()
+			'size' => $result->perPage(),
+			'sort' => $sortMode
 		];
+		
 		return ['data' => $data, 'meta' => $meta];
 		
     }
@@ -43,7 +44,20 @@ class Responses
 	{
 		$size = isset($page['size']) ? $page['size'] : 10;
 		$page = isset($page['number']) ? $page['number'] : 0;	
-		return ['page'=>$page, 'size'=>$size];
+		return ['page' => $page, 'size' => $size];
 	}
+	
+	public static function getSorting($sort)
+	{
+		if ( $sort === '' ) {
+			return ['column' => 'created_at', 'direction' => 'ASC', 'mode' => 'created-at'];
+		}
+		
+		$isDescStr = substr($sort , 0, 1);
+		$direction = $isDescStr === '-' ? 'DESC' : 'ASC';
+		$column = $direction === 'DESC' ? substr( $sort , 1 ) : $sort;
+		return ['column' => $column, 'direction' => $direction, 'mode' => $sort];
+	}
+	
 
 }

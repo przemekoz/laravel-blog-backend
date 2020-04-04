@@ -27,12 +27,21 @@ class ElementController extends Controller
 	
     public function index(Request $request)
     {
-		$paging = Responses::getPaging($request->has('page') ? $request->input('page') : []);
+		// Set query builder
+		$elementQuery = Element::query();
 		
-		//public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null);		
-        $result = Element::paginate($paging['size'], ['*'], 'page', $paging['page']);
-        //return Element::all();
-		return Responses::list($result, function($elem){ return ElementResponseMap::map($elem); });
+		// filtering
+		if($request->has('q')){
+			$elementQuery->ofSearch($q);
+		}
+		
+		$sorting = Responses::getSorting($request->has('sort') ? $request->input('sort') : '');
+		$elementQuery->orderBy($sorting['column'], $sorting['direction']);
+		
+		$paging = Responses::getPaging($request->has('page') ? $request->input('page') : []);
+		$result = $elementQuery->paginate($paging['size'], ['*'], 'page', $paging['page']); // size, coulumns, pageName, page
+		
+		return Responses::list($result, $sorting['mode'], function($elem){ return ElementResponseMap::map($elem); });
     }
  
     public function show(Element $element)
