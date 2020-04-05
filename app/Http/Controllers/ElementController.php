@@ -25,14 +25,20 @@ class ElementController extends Controller
 		);
 	}
 	
-    public function index(Request $request)
+    public function index(Request $request, Element $element)
     {
 		// Set query builder
 		$elementQuery = Element::query();
 		
 		// filtering
-		if($request->has('q')){
-			$elementQuery->ofSearch($q);
+		if($request->has('filter')){
+			$filterType = $request->has('filterType') ? $request->input('filterType') : [];
+			list($filters, $filtersMode) = Responses::getFiltering($request->input('filter'), $filterType, $element->getAvailableFields());
+			
+			forEach ($filters as $filter) {
+				print_r($filter);
+				$elementQuery->where($filter['column'], $filter['operator'], $filter['parameter']);
+			}
 		}
 		
 		$sorting = Responses::getSorting($request->has('sort') ? $request->input('sort') : '');
@@ -41,7 +47,7 @@ class ElementController extends Controller
 		$paging = Responses::getPaging($request->has('page') ? $request->input('page') : []);
 		$result = $elementQuery->paginate($paging['size'], ['*'], 'page', $paging['page']); // size, coulumns, pageName, page
 		
-		return Responses::list($result, $sorting['mode'], function($elem){ return ElementResponseMap::map($elem); });
+		return Responses::list($result, $sorting['mode'], $filtersMode, function($elem){ return ElementResponseMap::map($elem); });
     }
  
     public function show(Element $element)

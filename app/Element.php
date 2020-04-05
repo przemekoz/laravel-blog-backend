@@ -13,4 +13,9 @@ class Element extends Model
     {
         return $this->belongsToMany('App\ElementTag', 'element_tag_rel_m2_m_s', 'element_id', 'elementtag_id');
     }
+	
+	public function getAvailableFields()
+	{
+		return $this->fillable;
+	}
 }

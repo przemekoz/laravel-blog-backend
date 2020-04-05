@@ -5,7 +5,7 @@ namespace App\Http;
 class Responses
 {
 
-    public static function list($result, $sortMode, $mapFoo)
+    public static function list($result, $sortMode, $filterMode, $mapFoo)
     {
 		$data = array();
 		foreach ($result->items() as $item) {
@@ -16,7 +16,8 @@ class Responses
 			'currentPage' => $result->currentPage(), 
 			'lastPage' => $result->lastPage(), 
 			'size' => $result->perPage(),
-			'sort' => $sortMode
+			'sort' => $sortMode,
+			'filter' => $filterMode
 		];
 		
 		return ['data' => $data, 'meta' => $meta];
@@ -58,6 +59,37 @@ class Responses
 		$column = $direction === 'DESC' ? substr( $sort , 1 ) : $sort;
 		return ['column' => $column, 'direction' => $direction, 'mode' => $sort];
 	}
+	
+	public static function getFiltering($filter, $filterType, $availableFields)
+	{
+		$filtersMode = [];
+		$filters = [];
+		forEach(array_keys($filter) as $key) {
+			if (in_array($key, $availableFields)) {
+				$operator = Responses::getOperator($key, $filterType);
+				$parameter = $operator === 'like' ? "%{$filter[$key]}%" : $filter[$key];
+				array_push($filters, ['column' => $key, 'operator' => $operator, 'parameter' => $parameter]);
+				array_push($filtersMode, $key);
+			}
+		}
+		
+		return [$filters, join(', ', $filtersMode)];
+	}
+	
+	private static function getOperator($key, $filterType)
+	{
+		$type = array_key_exists($key, $filterType) ? strtolower($filterType[$key]) : 'default';
+		switch ($type) {
+			case 'text':
+				return 'like';
+			case 'range':
+				return '>';
+				
+			default:
+				return '=';
+		}
+	}
+		
 	
 
 }
