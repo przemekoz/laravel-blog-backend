@@ -27,6 +27,8 @@ class ElementController extends Controller
 	
     public function index(Request $request, Element $element)
     {
+		$filtersMode = '';
+		
 		// Set query builder
 		$elementQuery = Element::query();
 		
@@ -36,7 +38,6 @@ class ElementController extends Controller
 			list($filters, $filtersMode) = Responses::getFiltering($request->input('filter'), $filterType, $element->getAvailableFields());
 			
 			forEach ($filters as $filter) {
-				print_r($filter);
 				$elementQuery->where($filter['column'], $filter['operator'], $filter['parameter']);
 			}
 		}

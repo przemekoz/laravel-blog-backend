@@ -103,8 +103,12 @@ class Responses
 				
 				if ( count($fromTo) === 2 ) {
 					list( $from, $to ) = $fromTo;
-					array_push($items, ['column' => $key, 'operator' => '>=', 'parameter' => $from]);
-					array_push($items, ['column' => $key, 'operator' => '<=', 'parameter' => $to]);	
+					if ( strtolower($from) !== 'null' ) {
+						array_push($items, ['column' => $key, 'operator' => '>=', 'parameter' => $from]);
+					}
+					if ( strtolower($to) !== 'null' ) {
+						array_push($items, ['column' => $key, 'operator' => '<=', 'parameter' => $to]);	
+					}
 				}
 				
 				break;
