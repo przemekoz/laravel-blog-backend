@@ -62,18 +62,22 @@ class Responses
 	
 	public static function getFiltering($filter, $filterType, $availableFields)
 	{
+		$availableFields = array_merge($availableFields, ['created_at', 'updated_at']);
 		$filtersMode = [];
 		$filters = [];
 		forEach(array_keys($filter) as $key) {
 			if (in_array($key, $availableFields)) {
 				$operator = Responses::getOperator($key, $filterType);
 				$parameter = $operator === 'like' ? "%{$filter[$key]}%" : $filter[$key];
-				array_push($filters, ['column' => $key, 'operator' => $operator, 'parameter' => $parameter]);
+				
 				array_push($filtersMode, $key);
+				forEach(Responses::getFilterItem($key, $operator, $parameter) as $item) {
+					array_push($filters, $item);
+				}
 			}
 		}
 		
-		return [$filters, join(', ', $filtersMode)];
+		return [$filters, join(',', $filtersMode)];
 	}
 	
 	private static function getOperator($key, $filterType)
@@ -83,13 +87,34 @@ class Responses
 			case 'text':
 				return 'like';
 			case 'range':
-				return '>';
-				
+				return 'range';
 			default:
 				return '=';
 		}
 	}
 		
+	private static function getFilterItem($key, $operator, $parameter)
+	{
+		$items = [];
+		
+		switch ($operator) {
+			case 'range':
+				$fromTo = explode(',', $parameter);
+				
+				if ( count($fromTo) === 2 ) {
+					list( $from, $to ) = $fromTo;
+					array_push($items, ['column' => $key, 'operator' => '>=', 'parameter' => $from]);
+					array_push($items, ['column' => $key, 'operator' => '<=', 'parameter' => $to]);	
+				}
+				
+				break;
+			default:
+				array_push($items, ['column' => $key, 'operator' => $operator, 'parameter' => $parameter]);
+				break;
+		}
+		
+		return $items;
+	}		
 	
 
 }
