@@ -53,7 +53,7 @@ class ElementController extends Controller
  
     public function show(Element $element)
     {
-		return response()->json(ElementResponseMap::map($element), 200);
+		return response()->json(['data' => ElementResponseMap::map($element)] , 200);
     }
 
     public function showWithTags(Element $element)

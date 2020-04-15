@@ -13,7 +13,8 @@ class Responses
 		}
 		$meta = [
 			'total' => $result->total(), 
-			'currentPage' => $result->currentPage(), 
+			'currentPage' => $result->currentPage(),
+			'totalPages' => $result->lastPage(),			
 			'lastPage' => $result->lastPage(), 
 			'size' => $result->perPage(),
 			'sort' => $sortMode,
@@ -26,7 +27,7 @@ class Responses
 	
 	public static function item($id, $type, $attributes)
 	{
-		return ["id" => $id, "type" => $type, "attributes" => $attributes];
+		return ['id' => $id, 'type' => $type, 'attributes' => $attributes];
 	}
 
 	public static function itemWithRelations($id, $type, $attributes, $relType, $relationData, $mapFoo)
