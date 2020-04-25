@@ -30,6 +30,7 @@ Route::get(     'v1/elements',            'ElementController@index');
 Route::get(     'v1/elements/{element}',  'ElementController@show');
 Route::post(    'v1/elements',            'ElementController@store');
 Route::put(     'v1/elements/{element}',  'ElementController@update');
+Route::patch(   'v1/elements/{element}',  'ElementController@update');
 Route::delete(  'v1/elements/{element}',  'ElementController@delete');
 Route::get(     'v1/elements/withTags/{element}',  'ElementController@showWithTags');
 

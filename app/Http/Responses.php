@@ -81,6 +81,26 @@ class Responses
 		return [$filters, join(',', $filtersMode)];
 	}
 	
+	public static function getDataForStore($data)
+	{	
+		$toStore = [];
+		
+		forEach($data['data'] as $key => $value) {
+			
+			if ($key === 'id') {
+				$toStore['id'] = $value;	
+			}
+			
+			if ($key === 'attributes') {
+				forEach($value as $keyIn => $valueIn) {
+					$toStore[$keyIn] = $valueIn;	
+				}
+			}
+		}
+		
+		return $toStore;
+	}
+	
 	private static function getOperator($key, $filterType)
 	{
 		$type = array_key_exists($key, $filterType) ? strtolower($filterType[$key]) : 'default';
@@ -120,6 +140,4 @@ class Responses
 		
 		return $items;
 	}		
-	
-
 }

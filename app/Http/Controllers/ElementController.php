@@ -63,14 +63,14 @@ class ElementController extends Controller
 
     public function store(Request $request)
     {
-        $element = Element::create($request->all());
-        return response()->json(ElementResponseMap::map($element), 201);
+        $element = Element::create(Responses::getDataForStore($request->all()));
+        return response()->json(['data' => ElementResponseMap::map($element)], 201);
     }
 
     public function update(Request $request, Element $element)
     {
-        $element->update($request->all());
-        return response()->json(ElementResponseMap::map($element), 200);
+        $element->update(Responses::getDataForStore($request->all()));
+        return response()->json(['data' => ElementResponseMap::map($element)], 200);
     }
 
     public function delete(Element $element)
